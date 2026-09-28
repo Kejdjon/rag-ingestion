@@ -1,0 +1,7 @@
+Company Policy
+
+All employees must follow data security procedures.
+Passwords should not be shared.
+Sensitive customer information must be protected.
+Employees should report security incidents immediately.
+``

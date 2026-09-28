@@ -1,0 +1,26 @@
+[
+  {
+    "chunk": "Company Policy All employees must follow data security procedures. Passwords should not be shared. Sensitive customer information must be protected. Employees should report security incidents immediately. ``",
+    "metadata": {
+      "source": "company_policy.txt",
+      "page": 1,
+      "chunk_id": 0
+    }
+  },
+  {
+    "chunk": "Employee Handbook Employees are expected to maintain professional conduct. Attendance should be regular and punctual. Team collaboration and communication are encouraged. Training opportunities are available throughout the year.",
+    "metadata": {
+      "source": "employee_handbook.txt",
+      "page": 1,
+      "chunk_id": 0
+    }
+  },
+  {
+    "chunk": "Artificial Intelligence Notes Artificial Intelligence enables machines to perform tasks that typically require human intelligence. Machine learning is a subset of artificial intelligence. Deep learning uses neural networks with multiple layers.",
+    "metadata": {
+      "source": "ai_notes.txt",
+      "page": 1,
+      "chunk_id": 0
+    }
+  }
+]
