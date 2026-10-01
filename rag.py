@@ -26,6 +26,22 @@ def load_resource():
 
     return index, chunks
 
+def rewrite_query(query):
+
+    query = query.lower()
+
+    replacements = {
+        "ai": "artificial intelligence",
+        "ml": "machine learning",
+        "staff": "employees",
+        "security breach": "security incident"
+    }
+
+    for old, new in replacements.items():
+        query = query.replace(old, new)
+
+    return query
+
 
 def retrieve(query, index, chunks, top_k=1):
 
@@ -71,7 +87,7 @@ Give a short answer based only on the context.
 
     response = generator(
         prompt,
-        max_length=50,
+        max_new_tokens=50,
         do_sample=False
     )
 
@@ -83,6 +99,8 @@ Give a short answer based only on the context.
 def rag(question):
 
     index, chunks = load_resource()
+
+    question = rewrite_query(question)
 
     retrieved, score = retrieve(
         question,
@@ -113,12 +131,12 @@ def rag(question):
     print("\nAnswer:")
     print("=" * 60)
     print(answer)
-
-    print("\nSources")
+    print("\nCitation")
     print("=" * 60)
 
     for source in retrieved:
         print(source["metadata"]["source"])
+
 
 
 if __name__ == "__main__":
