@@ -72,7 +72,6 @@ a subset of artificial intelligence
 Sources:
 ai_notes.txt
 ```
-
 If information is not found:
 
 ```text
@@ -81,9 +80,21 @@ Question: What is the CEO salary?
 Answer:
 I cannot find enough evidence in the provided documents.
 
-Sources:
+Citation:
 None
 ```
+
+## Module 4: Evaluation & Enhancement (`evaluation.md`)
+
+Improves retrieval using **Query Rewriting** and adds **citations** to generated answers.
+
+Features:
+- Query rewriting (e.g., AI → Artificial Intelligence)
+- Source citations
+- Evaluation set of 10 questions
+- Grounded answer validation
+
+Result: **10/10 evaluation score**
 
 ---
 
@@ -95,11 +106,13 @@ rag-ingestion/
 ├── ingest.py
 ├── retrieval.py
 ├── rag.py
+├── evaluation.md
 ├── chunks.json
 ├── vector.index
 ├── README.md
 └── .gitignore
 ```
+
 
 ## Workflow
 
