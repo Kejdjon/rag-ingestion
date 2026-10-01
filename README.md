@@ -97,6 +97,31 @@ Features:
 Result: **10/10 evaluation score**
 
 ---
+## Module 5: RAG Knowledge Assistant
+
+The final project combines all previous modules into a complete document Question & Answer assistant.
+
+### Architecture
+
+```text
+User Question
+      ↓
+RAG Assistant
+      ↓
+Knowledge Base
+      ↓
+Answer + Citation
+```
+
+### Outcome
+
+✅ Answers questions from documents
+
+✅ Returns citations
+
+✅ Handles unsupported questions safely
+
+✅ Evaluation score: 10/10
 
 ## Project Structure
 
@@ -125,11 +150,13 @@ Chunks + Metadata
     ↓
 Embeddings + FAISS
     ↓
+Query Rewriting
+    ↓
 Semantic Retrieval
     ↓
 LLM
     ↓
-Answer + Sources
+Answer + Citation
 ```
 
 ## Features
