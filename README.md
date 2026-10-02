@@ -28,7 +28,7 @@ python ingest.py
 Custom chunking:
 
 ```bash
-python ingest.py --chunk-size 300 --overlap 30
+python ingest.py --chunk-size 500 --overlap 50
 ```
 
 ---
