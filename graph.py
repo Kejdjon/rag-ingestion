@@ -1,4 +1,5 @@
 from typing import TypedDict
+
 from langgraph.graph import StateGraph
 
 from rag import (
@@ -8,19 +9,156 @@ from rag import (
     generate_answer
 )
 
-
-# Load resources once
+# Load RAG resources once
 index, chunks = load_resource()
 
+# Mock customer database
+CUSTOMERS = {
+    "1001": {
+        "name": "John Smith",
+        "status": "Active"
+    },
+    "1002": {
+        "name": "Jane Doe",
+        "status": "Suspended"
+    }
+}
 
-class RAGState(TypedDict):
+
+class AgentState(TypedDict, total=False):
     question: str
+    tool: str
     rewritten_question: str
     context: str
     answer: str
     citation: str
     score: float
 
+
+# --------------------
+# TOOLS
+# --------------------
+
+def calculator_tool(expression: str):
+
+    try:
+        result = eval(expression)
+
+        return {
+            "success": True,
+            "result": result
+        }
+
+    except Exception as e:
+
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+def customer_lookup_tool(customer_id: str):
+
+    customer = CUSTOMERS.get(customer_id)
+
+    if customer:
+
+        return {
+            "success": True,
+            "customer": customer
+        }
+
+    return {
+        "success": False,
+        "error": "Customer not found"
+    }
+
+
+# --------------------
+# ROUTER NODE
+# --------------------
+
+def router_node(state):
+
+    question = state["question"].lower()
+
+    if any(op in question for op in ["+", "-", "*", "/"]):
+
+        tool = "calculator"
+
+    elif "customer" in question:
+
+        tool = "customer"
+
+    else:
+
+        tool = "rag"
+
+    print("\n=== Router Node ===")
+    print(f"Selected Tool: {tool}")
+
+    return {
+        "tool": tool
+    }
+
+
+# --------------------
+# CALCULATOR NODE
+# --------------------
+
+def calculator_node(state):
+
+    result = calculator_tool(
+        state["question"]
+    )
+
+    if result["success"]:
+
+        return {
+            "answer": f"Result = {result['result']}",
+            "citation": "Calculator Tool"
+        }
+
+    return {
+        "answer": f"Calculator Error: {result['error']}",
+        "citation": "Calculator Tool"
+    }
+
+
+# --------------------
+# CUSTOMER NODE
+# --------------------
+
+def customer_node(state):
+
+    customer_id = "".join(
+        c for c in state["question"]
+        if c.isdigit()
+    )
+
+    result = customer_lookup_tool(
+        customer_id
+    )
+
+    if result["success"]:
+
+        customer = result["customer"]
+
+        return {
+            "answer":
+                f"Customer: {customer['name']} | Status: {customer['status']}",
+            "citation": "Customer Lookup Tool"
+        }
+
+    return {
+        "answer": "Customer not found",
+        "citation": "Customer Lookup Tool"
+    }
+
+
+# --------------------
+# RAG NODES
+# --------------------
 
 def rewrite_node(state):
 
@@ -58,12 +196,17 @@ def retrieve_node(state):
         top_k=1
     )
 
-    context = build_context(retrieved)
+    context = build_context(
+        retrieved
+    )
 
     citation = "None"
 
     if retrieved:
-        citation = retrieved[0]["metadata"]["source"]
+
+        citation = (
+            retrieved[0]["metadata"]["source"]
+        )
 
     print("\n=== Retrieve Node ===")
     print(f"Citation: {citation}")
@@ -90,13 +233,10 @@ def generate_node(state):
         or answer.lower() == "unanswerable"
         or score > 1.5
     ):
-        answer = (
-            "I cannot find enough evidence "
-            "in the provided documents."
-        )
 
         return {
-            "answer": answer,
+            "answer":
+                "I cannot find enough evidence in the provided documents.",
             "citation": "None"
         }
 
@@ -107,6 +247,10 @@ def generate_node(state):
         "answer": answer
     }
 
+
+# --------------------
+# OUTPUT NODE
+# --------------------
 
 def output_node(state):
 
@@ -121,9 +265,37 @@ def output_node(state):
     return {}
 
 
-# Build Graph
+# --------------------
+# ROUTING
+# --------------------
 
-graph_builder = StateGraph(RAGState)
+def route_tool(state):
+
+    return state["tool"]
+
+
+# --------------------
+# BUILD GRAPH
+# --------------------
+
+graph_builder = StateGraph(
+    AgentState
+)
+
+graph_builder.add_node(
+    "router",
+    router_node
+)
+
+graph_builder.add_node(
+    "calculator",
+    calculator_node
+)
+
+graph_builder.add_node(
+    "customer",
+    customer_node
+)
 
 graph_builder.add_node(
     "rewrite",
@@ -145,11 +317,28 @@ graph_builder.add_node(
     output_node
 )
 
-
-# Define Flow
-
 graph_builder.set_entry_point(
-    "rewrite"
+    "router"
+)
+
+graph_builder.add_conditional_edges(
+    "router",
+    route_tool,
+    {
+        "calculator": "calculator",
+        "customer": "customer",
+        "rag": "rewrite"
+    }
+)
+
+graph_builder.add_edge(
+    "calculator",
+    "output"
+)
+
+graph_builder.add_edge(
+    "customer",
+    "output"
 )
 
 graph_builder.add_edge(
@@ -167,15 +356,14 @@ graph_builder.add_edge(
     "output"
 )
 
-
-# Compile Graph
-
 graph = graph_builder.compile()
+
+
 
 
 if __name__ == "__main__":
 
-    print("LangGraph RAG Assistant")
+    print("LangGraph Multi-Tool Assistant")
 
     while True:
 
@@ -191,3 +379,4 @@ if __name__ == "__main__":
                 "question": question
             }
         )
+    
