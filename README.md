@@ -1,6 +1,6 @@
 # RAG Pipeline Project
 
-This project implements a complete Retrieval-Augmented Generation (RAG) pipeline in Python, consisting of document ingestion, semantic retrieval, and answer generation using retrieved context.
+This project implements a complete Retrieval-Augmented Generation (RAG) pipeline in Python, consisting of document ingestion, semantic retrieval, answer generation, workflow orchestration with LangGraph, and multi-tool agent capabilities.
 
 ## Installation
 
@@ -13,7 +13,11 @@ pip install sentence-transformers
 pip install faiss-cpu
 pip install transformers
 pip install torch
+pip install langgraph
+pip install langchain-core
 ```
+
+---
 
 ## Module 1: Document Ingestion (`ingest.py`)
 
@@ -53,7 +57,7 @@ vector.index
 
 ## Module 3: End-to-End RAG (`rag.py`)
 
-Accepts a user question, retrieves relevant chunks from the vector store, generates an answer using only the retrieved context, and returns the supporting sources.
+Accepts a user question, retrieves relevant chunks from the vector store, generates an answer using only the retrieved context, and returns citations.
 
 Run:
 
@@ -69,10 +73,11 @@ Question: What is machine learning?
 Answer:
 a subset of artificial intelligence
 
-Sources:
+Citation:
 ai_notes.txt
 ```
-If information is not found:
+
+Unsupported question:
 
 ```text
 Question: What is the CEO salary?
@@ -84,12 +89,15 @@ Citation:
 None
 ```
 
+---
+
 ## Module 4: Evaluation & Enhancement (`evaluation.md`)
 
-Improves retrieval using **Query Rewriting** and adds **citations** to generated answers.
+Improves retrieval using Query Rewriting and adds citations to generated answers.
 
 Features:
-- Query rewriting (e.g., AI → Artificial Intelligence)
+
+- Query rewriting (AI → Artificial Intelligence)
 - Source citations
 - Evaluation set of 10 questions
 - Grounded answer validation
@@ -97,9 +105,10 @@ Features:
 Result: **10/10 evaluation score**
 
 ---
+
 ## Module 5: RAG Knowledge Assistant
 
-The final project combines all previous modules into a complete document Question & Answer assistant.
+Combines all previous modules into a complete document Question & Answer assistant.
 
 ### Architecture
 
@@ -113,15 +122,88 @@ Knowledge Base
 Answer + Citation
 ```
 
-### Outcome
+Outcome:
 
-✅ Answers questions from documents
+- Answers questions from documents
+- Returns citations
+- Handles unsupported questions safely
 
-✅ Returns citations
+---
 
-✅ Handles unsupported questions safely
+## Module 6: LangGraph Orchestration (`graph.py`)
 
-✅ Evaluation score: 10/10
+Wraps the RAG workflow in a LangGraph state machine with explicit state, nodes, and edges.
+
+### Architecture
+
+```text
+Question
+    ↓
+Rewrite Node
+    ↓
+Retrieve Node
+    ↓
+Generate Node
+    ↓
+Output Node
+```
+
+Features:
+
+- Explicit state schema
+- Graph-based workflow
+- State logging
+- Retrieval and generation as graph nodes
+
+Run:
+
+```bash
+python graph.py
+```
+
+---
+
+## Module 7: Multi-Tool Agent (`graph.py`)
+
+Extends the LangGraph workflow with additional tools and intelligent routing.
+
+### Available Tools
+
+- RAG Knowledge Base
+- Calculator Tool
+- Customer Lookup Tool
+
+### Architecture
+
+```text
+                 Router
+                    │
+     ┌──────────────┼──────────────┐
+     ↓              ↓              ↓
+ Calculator     Customer          RAG
+     │              │              │
+     └──────────────┴──────────────┘
+                    ↓
+                 Output
+```
+
+Example:
+
+```text
+Question: 25 * 4
+
+Answer:
+Result = 100
+```
+
+```text
+Question: customer 1001
+
+Answer:
+Customer: John Smith | Status: Active
+```
+
+---
 
 ## Project Structure
 
@@ -131,6 +213,7 @@ rag-ingestion/
 ├── ingest.py
 ├── retrieval.py
 ├── rag.py
+├── graph.py
 ├── evaluation.md
 ├── chunks.json
 ├── vector.index
@@ -138,6 +221,7 @@ rag-ingestion/
 └── .gitignore
 ```
 
+---
 
 ## Workflow
 
@@ -156,16 +240,27 @@ Semantic Retrieval
     ↓
 LLM
     ↓
+LangGraph Workflow
+    ↓
+Multi-Tool Agent
+    ↓
 Answer + Citation
 ```
 
+---
+
 ## Features
 
-✅ Load and process PDF/TXT documents  
-✅ Configurable chunk size and overlap  
-✅ Metadata included for every chunk  
-✅ Embedding generation and vector indexing  
-✅ Semantic similarity search  
+✅ Document ingestion and chunking  
+✅ Metadata generation  
+✅ Sentence Transformer embeddings  
+✅ FAISS vector search  
+✅ Query rewriting  
 ✅ Grounded answer generation  
-✅ Source attribution  
-✅ No-evidence fallback response
+✅ Source citations  
+✅ Safe failure handling  
+✅ LangGraph orchestration  
+✅ Multi-tool agent routing  
+✅ Calculator tool  
+✅ Customer lookup tool  
+✅ Evaluation dataset and testing
