@@ -1,5 +1,4 @@
 from typing import TypedDict
-
 from langgraph.graph import StateGraph
 
 from rag import (
@@ -33,6 +32,7 @@ class AgentState(TypedDict, total=False):
     answer: str
     citation: str
     score: float
+    status: str
 
 
 # --------------------
@@ -72,7 +72,18 @@ def customer_lookup_tool(customer_id: str):
         "success": False,
         "error": "Customer not found"
     }
+def error_node(state):
 
+    return {
+        "status": "error",
+        "answer": (
+            "I cannot process this request "
+            "at the moment."
+        ),
+        "citation": "Error Handler"
+    }
+
+    
 
 # --------------------
 # ROUTER NODE
@@ -115,20 +126,26 @@ def calculator_node(state):
     if result["success"]:
 
         return {
-            "answer": f"Result = {result['result']}",
-            "citation": "Calculator Tool"
+            "status": "success",
+            "answer":
+                f"Result = {result['result']}",
+            "citation":
+                "Calculator Tool"
         }
 
     return {
-        "answer": f"Calculator Error: {result['error']}",
-        "citation": "Calculator Tool"
+        "status": "error",
+        "answer":
+            "Invalid mathematical expression.",
+        "citation":
+            "Calculator Tool"
     }
+
 
 
 # --------------------
 # CUSTOMER NODE
 # --------------------
-
 def customer_node(state):
 
     customer_id = "".join(
@@ -145,14 +162,20 @@ def customer_node(state):
         customer = result["customer"]
 
         return {
+            "status": "success",
             "answer":
-                f"Customer: {customer['name']} | Status: {customer['status']}",
-            "citation": "Customer Lookup Tool"
+                f"Customer: {customer['name']} | "
+                f"Status: {customer['status']}",
+            "citation":
+                "Customer Lookup Tool"
         }
 
     return {
-        "answer": "Customer not found",
-        "citation": "Customer Lookup Tool"
+        "status": "error",
+        "answer":
+            "Customer not found",
+        "citation":
+            "Customer Lookup Tool"
     }
 
 
@@ -235,15 +258,22 @@ def generate_node(state):
     ):
 
         return {
+            "status": "error",
             "answer":
-                "I cannot find enough evidence in the provided documents.",
-            "citation": "None"
+                (
+                    "I cannot find enough "
+                    "evidence in the provided "
+                    "documents."
+                ),
+            "citation":
+                "None"
         }
 
     print("\n=== Generate Node ===")
     print(answer)
 
     return {
+        "status": "success",
         "answer": answer
     }
 
@@ -316,6 +346,10 @@ graph_builder.add_node(
     "output",
     output_node
 )
+graph_builder.add_node(
+    "error",
+    error_node
+)
 
 graph_builder.set_entry_point(
     "router"
@@ -379,4 +413,3 @@ if __name__ == "__main__":
                 "question": question
             }
         )
-    
