@@ -1,8 +1,10 @@
 # RAG Pipeline Project
 
-This project implements a complete Retrieval-Augmented Generation (RAG) pipeline in Python, consisting of document ingestion, semantic retrieval, answer generation, workflow orchestration with LangGraph, and multi-tool agent capabilities.
+This project implements a complete Retrieval-Augmented Generation (RAG) pipeline in Python consisting of document ingestion, semantic retrieval, answer generation, LangGraph orchestration, multi-tool routing, and error recovery.
 
-## Installation
+---
+
+# Installation
 
 ```bash
 python3 -m venv venv
@@ -19,11 +21,29 @@ pip install langchain-core
 
 ---
 
-## Module 1: Document Ingestion (`ingest.py`)
+# Module 1: Document Ingestion (`ingest.py`)
 
-Loads PDF/TXT documents, extracts and cleans text, creates configurable chunks, adds metadata (source, page, chunk_id), and exports the results to `chunks.json`.
+Loads PDF/TXT documents, extracts and cleans text, creates configurable chunks, adds metadata, and exports the results to `chunks.json`.
 
-Run:
+## Features
+
+- PDF and TXT document support
+- Text cleaning
+- Configurable chunk size
+- Configurable overlap
+- Metadata generation
+
+Metadata includes:
+
+```json
+{
+  "source": "ai_notes.txt",
+  "page": 1,
+  "chunk_id": 0
+}
+```
+
+## Run
 
 ```bash
 python ingest.py
@@ -35,19 +55,51 @@ Custom chunking:
 python ingest.py --chunk-size 500 --overlap 50
 ```
 
+## Output
+
+```text
+chunks.json
+```
+
 ---
 
-## Module 2: Semantic Retrieval (`retrieval.py`)
+# Module 2: Semantic Retrieval (`retrieval.py`)
 
-Generates embeddings using Sentence Transformers, indexes all chunks in FAISS, and performs semantic search with configurable `top_k`.
+Generates embeddings using Sentence Transformers and indexes document chunks using FAISS for semantic search.
 
-Run:
+## Technologies
+
+### Embedding Model
+
+```text
+all-MiniLM-L6-v2
+```
+
+### Vector Database
+
+```text
+FAISS
+```
+
+## Workflow
+
+```text
+Chunks
+   ↓
+Embeddings
+   ↓
+FAISS Index
+   ↓
+Semantic Search
+```
+
+## Run
 
 ```bash
 python retrieval.py
 ```
 
-Output:
+## Output
 
 ```text
 vector.index
@@ -55,20 +107,29 @@ vector.index
 
 ---
 
-## Module 3: End-to-End RAG (`rag.py`)
+# Module 3: End-to-End RAG (`rag.py`)
 
-Accepts a user question, retrieves relevant chunks from the vector store, generates an answer using only the retrieved context, and returns citations.
+Combines retrieval and generation to answer user questions using retrieved document context.
 
-Run:
+## Features
+
+- Query Rewriting
+- Semantic Retrieval
+- FLAN-T5 Generation
+- Source Citations
+- Safe Failure Handling
+
+## Run
 
 ```bash
 python rag.py
 ```
 
-Example:
+## Example
 
 ```text
-Question: What is machine learning?
+Question:
+What is machine learning?
 
 Answer:
 a subset of artificial intelligence
@@ -77,10 +138,11 @@ Citation:
 ai_notes.txt
 ```
 
-Unsupported question:
+## Unsupported Question
 
 ```text
-Question: What is the CEO salary?
+Question:
+What is the CEO salary?
 
 Answer:
 I cannot find enough evidence in the provided documents.
@@ -91,26 +153,41 @@ None
 
 ---
 
-## Module 4: Evaluation & Enhancement (`evaluation.md`)
+# Module 4: Evaluation & Enhancement (`evaluation.md`)
 
-Improves retrieval using Query Rewriting and adds citations to generated answers.
+Improves retrieval quality and validates solution performance.
 
-Features:
+## Enhancements
 
-- Query rewriting (AI → Artificial Intelligence)
-- Source citations
-- Evaluation set of 10 questions
-- Grounded answer validation
+- Query Rewriting
+- Citation Support
+- Grounded Answer Verification
 
-Result: **10/10 evaluation score**
+Examples:
+
+```text
+AI → Artificial Intelligence
+
+Staff → Employees
+
+ML → Machine Learning
+```
+
+## Results
+
+```text
+10 Questions Tested
+10 Correct Results
+Score: 10/10
+```
 
 ---
 
-## Module 5: RAG Knowledge Assistant
+# Module 5: RAG Knowledge Assistant
 
-Combines all previous modules into a complete document Question & Answer assistant.
+Combines the ingestion, retrieval, and generation modules into a complete document Question & Answer assistant.
 
-### Architecture
+## Architecture
 
 ```text
 User Question
@@ -122,90 +199,267 @@ Knowledge Base
 Answer + Citation
 ```
 
-Outcome:
+## Features
 
-- Answers questions from documents
-- Returns citations
-- Handles unsupported questions safely
+✅ Answers questions from documents
+
+✅ Returns citations
+
+✅ Reduces hallucinations
+
+✅ Safe fallback for unsupported questions
 
 ---
 
-## Module 6: LangGraph Orchestration (`graph.py`)
+# Module 6: LangGraph Orchestration (`graph.py`)
 
-Wraps the RAG workflow in a LangGraph state machine with explicit state, nodes, and edges.
+Wraps the RAG workflow into a LangGraph state machine.
 
-### Architecture
+## State Schema
+
+```python
+class AgentState(TypedDict):
+    question: str
+    tool: str
+    rewritten_question: str
+    context: str
+    answer: str
+    citation: str
+    score: float
+    status: str
+```
+
+The state acts as shared memory between all graph nodes.
+
+## Graph Architecture
 
 ```text
 Question
     ↓
-Rewrite Node
+Rewrite
     ↓
-Retrieve Node
+Retrieve
     ↓
-Generate Node
+Generate
     ↓
-Output Node
+Output
 ```
 
-Features:
+## LangGraph Components
 
-- Explicit state schema
-- Graph-based workflow
-- State logging
-- Retrieval and generation as graph nodes
+### Nodes
 
-Run:
+- Rewrite Node
+- Retrieve Node
+- Generate Node
+- Output Node
 
-```bash
-python graph.py
+### Edges
+
+```text
+Rewrite
+   ↓
+Retrieve
+   ↓
+Generate
+   ↓
+Output
+```
+
+### Shared State
+
+Stores:
+
+```text
+Question
+Context
+Answer
+Citation
+Score
 ```
 
 ---
 
-## Module 7: Multi-Tool Agent (`graph.py`)
+# Module 7: Multi-Tool Agent (`graph.py`)
 
-Extends the LangGraph workflow with additional tools and intelligent routing.
+Extends the LangGraph workflow with multiple capabilities.
 
-### Available Tools
+## Available Tools
 
-- RAG Knowledge Base
-- Calculator Tool
-- Customer Lookup Tool
+### RAG Knowledge Assistant
 
-### Architecture
-
-```text
-                 Router
-                    │
-     ┌──────────────┼──────────────┐
-     ↓              ↓              ↓
- Calculator     Customer          RAG
-     │              │              │
-     └──────────────┴──────────────┘
-                    ↓
-                 Output
-```
+Used for document-based questions.
 
 Example:
 
 ```text
-Question: 25 * 4
+What is machine learning?
+```
 
-Answer:
+---
+
+### Calculator Tool
+
+Used for mathematical calculations.
+
+Example:
+
+```text
+25 * 4
+```
+
+Output:
+
+```text
 Result = 100
 ```
 
-```text
-Question: customer 1001
+---
 
-Answer:
+### Customer Lookup Tool
+
+Uses a mock customer database.
+
+Example:
+
+```text
+customer 1001
+```
+
+Output:
+
+```text
 Customer: John Smith | Status: Active
 ```
 
 ---
 
-## Project Structure
+# Module 8: Routing & Recovery (`graph.py`)
+
+Adds intelligent routing, structured outputs, and graceful failure handling.
+
+## Router Node
+
+Routes questions to the correct capability.
+
+```text
+User Question
+      ↓
+Router
+      ↓
+ ┌────┼────┐
+ ↓    ↓    ↓
+RAG Calc Customer
+```
+
+### Routing Examples
+
+```text
+What is AI?
+→ RAG
+```
+
+```text
+25 * 4
+→ Calculator
+```
+
+```text
+customer 1001
+→ Customer Lookup
+```
+
+---
+
+## Conditional Routing
+
+Implemented with LangGraph conditional edges.
+
+```python
+graph_builder.add_conditional_edges(...)
+```
+
+This dynamically selects the workflow path.
+
+---
+
+## Structured Output
+
+All nodes return a consistent response structure:
+
+```python
+{
+    "status": "success",
+    "answer": "...",
+    "citation": "..."
+}
+```
+
+Error responses:
+
+```python
+{
+    "status": "error",
+    "answer": "...",
+    "citation": "..."
+}
+```
+
+---
+
+## Error Recovery
+
+The agent handles failures without crashing.
+
+### Calculator Error
+
+Input:
+
+```text
+25**
+```
+
+Output:
+
+```text
+Invalid mathematical expression.
+```
+
+---
+
+### Customer Error
+
+Input:
+
+```text
+customer 9999
+```
+
+Output:
+
+```text
+Customer not found
+```
+
+---
+
+### Unsupported RAG Question
+
+Input:
+
+```text
+What is CEO salary?
+```
+
+Output:
+
+```text
+I cannot find enough evidence in the provided documents.
+```
+
+---
+
+# Project Structure
 
 ```text
 rag-ingestion/
@@ -223,7 +477,7 @@ rag-ingestion/
 
 ---
 
-## Workflow
+# End-to-End Architecture
 
 ```text
 Documents
@@ -232,35 +486,116 @@ Ingestion
     ↓
 Chunks + Metadata
     ↓
-Embeddings + FAISS
+Embeddings
     ↓
-Query Rewriting
+FAISS
     ↓
 Semantic Retrieval
     ↓
-LLM
+FLAN-T5
     ↓
-LangGraph Workflow
+LangGraph
     ↓
-Multi-Tool Agent
+Router
+ ┌──┼──┐
+ ↓  ↓  ↓
+RAG Calc Customer
     ↓
 Answer + Citation
 ```
 
 ---
 
-## Features
+# Example Questions
 
-✅ Document ingestion and chunking  
-✅ Metadata generation  
-✅ Sentence Transformer embeddings  
-✅ FAISS vector search  
-✅ Query rewriting  
-✅ Grounded answer generation  
-✅ Source citations  
-✅ Safe failure handling  
-✅ LangGraph orchestration  
-✅ Multi-tool agent routing  
-✅ Calculator tool  
-✅ Customer lookup tool  
-✅ Evaluation dataset and testing
+## RAG
+
+```text
+What is AI?
+```
+
+```text
+What is machine learning?
+```
+
+---
+
+## Calculator
+
+```text
+25 * 4
+```
+
+```text
+100 / 5
+```
+
+---
+
+## Customer Lookup
+
+```text
+customer 1001
+```
+
+```text
+customer 1002
+```
+
+---
+
+## Error Recovery
+
+```text
+25**
+```
+
+```text
+customer 9999
+```
+
+```text
+What is CEO salary?
+```
+
+---
+
+# Features
+
+✅ PDF/TXT ingestion
+
+✅ Configurable chunking
+
+✅ Metadata generation
+
+✅ Sentence Transformer embeddings
+
+✅ FAISS vector search
+
+✅ FLAN-T5 generation
+
+✅ Query rewriting
+
+✅ Source citations
+
+✅ Safe fallback handling
+
+✅ LangGraph orchestration
+
+✅ Shared state management
+
+✅ Conditional routing
+
+✅ Multi-tool agent
+
+✅ Calculator tool
+
+✅ Customer lookup tool
+
+✅ Error recovery
+
+✅ Structured outputs
+
+✅ Evaluation framework
+
+✅ End-to-end RAG workflow
