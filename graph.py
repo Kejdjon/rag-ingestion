@@ -1,5 +1,7 @@
 from typing import TypedDict
 from langgraph.graph import StateGraph
+import asyncio
+from mcp_client import get_employee_from_mcp
 
 from rag import (
     load_resource,
@@ -101,6 +103,10 @@ def router_node(state):
 
         tool = "customer"
 
+    elif "employee" in question:
+
+        tool = "mcp"
+
     else:
 
         tool = "rag"
@@ -111,7 +117,6 @@ def router_node(state):
     return {
         "tool": tool
     }
-
 
 # --------------------
 # CALCULATOR NODE
@@ -178,7 +183,37 @@ def customer_node(state):
             "Customer Lookup Tool"
     }
 
+# --------------------
+# MCP NODE
+# --------------------
+def mcp_node(state):
 
+    employee_id = "".join(
+        c for c in state["question"]
+        if c.isdigit()
+    )
+
+    try:
+
+        result = asyncio.run(
+            get_employee_from_mcp(
+                employee_id
+            )
+        )
+
+        return {
+            "status": "success",
+            "answer": str(result),
+            "citation": "MCP Server"
+        }
+
+    except Exception:
+
+        return {
+            "status": "error",
+            "answer": "MCP server unavailable",
+            "citation": "MCP Server"
+        }
 # --------------------
 # RAG NODES
 # --------------------
@@ -326,6 +361,10 @@ graph_builder.add_node(
     "customer",
     customer_node
 )
+graph_builder.add_node(
+    "mcp",
+    mcp_node
+)
 
 graph_builder.add_node(
     "rewrite",
@@ -361,6 +400,7 @@ graph_builder.add_conditional_edges(
     {
         "calculator": "calculator",
         "customer": "customer",
+        "mcp": "mcp",
         "rag": "rewrite"
     }
 )
@@ -372,6 +412,10 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "customer",
+    "output"
+)
+graph_builder.add_edge(
+    "mcp",
     "output"
 )
 
