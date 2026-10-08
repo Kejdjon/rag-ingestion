@@ -458,6 +458,51 @@ I cannot find enough evidence in the provided documents.
 ```
 
 ---
+## Module 9: MCP Integration
+
+An MCP server was integrated with the LangGraph agent to provide employee lookup functionality.
+
+### Start MCP Server
+
+```bash
+mcp run mcp_server.py --transport streamable-http
+```
+
+### Start Agent
+
+```bash
+python graph.py
+```
+
+### Example
+
+Input:
+
+```text
+employee 1001
+```
+
+Output:
+
+```text
+John Smith - IT
+```
+
+### Failure Handling
+
+If the MCP server is unavailable:
+
+```text
+MCP server unavailable
+```
+
+### Features
+
+- MCP Server (`mcp_server.py`)
+- MCP Client (`mcp_client.py`)
+- Employee Lookup Tool
+- LangGraph MCP Routing
+- Graceful Error Handling
 
 # Project Structure
 
