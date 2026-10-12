@@ -504,6 +504,72 @@ MCP server unavailable
 - LangGraph MCP Routing
 - Graceful Error Handling
 
+## Week 3: PDF Intake and Classification
+
+A PDF intake pipeline was implemented to analyze uploaded PDF documents and determine the appropriate extraction strategy.
+
+### Features
+
+- PDF validation and intake
+- Metadata extraction (file name and page count)
+- Text-based PDF detection
+- Scanned PDF detection
+- Processing-path selection
+- Classification logging
+- CSV output generation
+
+### Processing Flow
+
+```text
+PDF Upload
+     ↓
+Metadata Extraction
+     ↓
+Document Classification
+     ↓
+ ┌───────────────┬───────────────┐
+ ↓                               ↓
+Text-Based PDF            Scanned PDF
+ ↓                               ↓
+Direct Extraction           OCR Required
+```
+
+### Classification Results
+
+| Document | Classification | Processing |
+|-----------|---------------|------------|
+| Introduction to Artificial Intelligence.pdf | Text-Based | Direct Text Extraction |
+| Employee Handbook.pdf | Text-Based | Direct Text Extraction |
+| EMPLOYEE APPLICATION FORM.pdf | Scanned | OCR Required |
+| INVOICE.pdf | Scanned | OCR Required |
+| Doc6.pdf | Scanned | OCR Required |
+
+### Run
+
+```bash
+python intake.py
+```
+
+### Output
+
+The intake module generates:
+
+```text
+classification_results.csv
+```
+
+containing:
+
+- File name
+- Status
+- Page count
+- Classification
+- Processing decision
+
+### Outcome
+
+The solution successfully identifies whether a PDF should be processed through direct text extraction or OCR and logs the selected processing path for downstream document extraction workflows.
+
 # Project Structure
 
 ```text

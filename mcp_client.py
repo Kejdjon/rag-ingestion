@@ -2,7 +2,7 @@ import asyncio
 from mcp import Client
 
 
-async def get_employee_from_mcp(employee_id: str):
+async def get_employee_from_mcp(employee_id):
 
     async with Client(
         "http://localhost:8000/mcp"
@@ -15,4 +15,4 @@ async def get_employee_from_mcp(employee_id: str):
             }
         )
 
-        return str(result.structured_content)
+        return result
