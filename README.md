@@ -569,6 +569,66 @@ containing:
 ### Outcome
 
 The solution successfully identifies whether a PDF should be processed through direct text extraction or OCR and logs the selected processing path for downstream document extraction workflows.
+## Week 3: OCR Processing
+
+An OCR module was implemented to process scanned PDF documents identified during intake classification.
+
+### Features
+
+- OCR extraction using Tesseract
+- Page-level OCR output
+- Text normalization
+- Quality assessment
+- Controlled error handling
+
+### Workflow
+
+```text
+Scanned PDF
+     ↓
+PDF to Image Conversion
+     ↓
+OCR Extraction
+     ↓
+Text Normalization
+     ↓
+Quality Check
+     ↓
+Structured Output
+```
+
+### Example Results
+
+#### INVOICE.pdf
+
+```text
+Page: 1
+Quality: OK
+
+INVOICE
+Invoice Number: INV-1001
+Customer: ABC Trading Ltd
+Amount Due: EUR 2,500
+```
+
+#### EMPLOYEE APPLICATION FORM.pdf
+
+```text
+Page: 1
+Quality: OK
+
+EMPLOYEE APPLICATION FORM
+First Name:
+Last Name:
+Department:
+Phone Number:
+Email Address:
+Signature:
+```
+
+### Outcome
+
+The OCR module successfully extracts text from scanned PDFs, normalizes the output, flags low-quality pages, and returns controlled status messages when processing fails. The extracted text is prepared for downstream structured extraction and comparison activities.
 
 # Project Structure
 
