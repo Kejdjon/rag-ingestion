@@ -1,0 +1,13 @@
+{
+  "file": "EMPLOYEE APPLICATION FORM.pdf",
+  "source": "EMPLOYEE APPLICATION FORM.pdf",
+  "status": "success",
+  "pages": [
+    {
+      "page_number": 1,
+      "text": "EMPLOYEE APPLICATION FORM First Name: Last Name: Department: Phone Number: Email Address: Signature:"
+    }
+  ],
+  "key_value_pairs": [],
+  "tables": []
+}

@@ -1,0 +1,145 @@
+from pathlib import Path
+import json
+import re
+
+from ocr import ocr_pdf
+
+
+PDF_FOLDER = "sample_pdfs"
+OUTPUT_FOLDER = "di_output"
+
+Path(OUTPUT_FOLDER).mkdir(
+    exist_ok=True
+)
+
+
+def extract_key_value_pairs(text):
+
+    fields = [
+        "Invoice Number",
+        "Customer",
+        "Date",
+        "Amount Due"
+    ]
+
+    pairs = []
+
+    for i, field in enumerate(fields):
+
+        pattern = f"{field}:"
+
+        start = text.find(pattern)
+
+        if start == -1:
+            continue
+
+        start += len(pattern)
+
+        end = len(text)
+
+        for next_field in fields[i+1:]:
+
+            pos = text.find(
+                next_field + ":",
+                start
+            )
+
+            if pos != -1:
+                end = pos
+                break
+
+        value = text[start:end].strip()
+
+        pairs.append(
+            {
+                "key": field,
+                "value": value
+            }
+        )
+
+    return pairs
+
+
+def process_document(pdf_file):
+
+    result = ocr_pdf(pdf_file)
+
+    if result["status"] == "error":
+
+        return {
+            "file": pdf_file.name,
+            "status": "error",
+            "message": result["message"]
+        }
+
+    pages = []
+    all_pairs = []
+
+    for page in result["pages"]:
+
+        pages.append(
+            {
+                "page_number": page["page"],
+                "text": page["text"]
+            }
+        )
+
+        all_pairs.extend(
+            extract_key_value_pairs(
+                page["text"]
+            )
+        )
+
+    return {
+        "file": pdf_file.name,
+        "source": pdf_file.name,
+        "status": "success",
+        "pages": pages,
+        "key_value_pairs": all_pairs,
+        "tables": []
+    }
+
+
+def main():
+
+    documents = [
+        "INVOICE.pdf",
+        "EMPLOYEE APPLICATION FORM.pdf",
+        "Employee Handbook.pdf"
+    ]
+
+    for document in documents:
+
+        pdf_path = (
+            Path(PDF_FOLDER)
+            / document
+        )
+
+        output = process_document(
+            pdf_path
+        )
+
+        output_file = (
+            Path(OUTPUT_FOLDER)
+            / f"{pdf_path.stem}.json"
+        )
+
+        with open(
+            output_file,
+            "w",
+            encoding="utf-8"
+        ) as f:
+
+            json.dump(
+                output,
+                f,
+                indent=2
+            )
+
+        print(
+            f"Processed: {document}"
+        )
+
+
+if __name__ == "__main__":
+    main()

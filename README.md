@@ -630,143 +630,23 @@ Signature:
 
 The OCR module successfully extracts text from scanned PDFs, normalizes the output, flags low-quality pages, and returns controlled status messages when processing fails. The extracted text is prepared for downstream structured extraction and comparison activities.
 
-# Project Structure
 
-```text
-rag-ingestion/
-├── documents/
-├── ingest.py
-├── retrieval.py
-├── rag.py
-├── graph.py
-├── evaluation.md
-├── chunks.json
-├── vector.index
-├── README.md
-└── .gitignore
-```
+## Week 3: Document Intelligence Style Processing
 
----
+### PDF Intake & Classification
+- Detects text-based vs scanned PDFs
+- Extracts metadata
+- Routes documents to extraction or OCR
 
-# End-to-End Architecture
+### OCR Processing
+- Tesseract OCR
+- Text normalization
+- Quality flags
+- Error handling
 
-```text
-Documents
-    ↓
-Ingestion
-    ↓
-Chunks + Metadata
-    ↓
-Embeddings
-    ↓
-FAISS
-    ↓
-Semantic Retrieval
-    ↓
-FLAN-T5
-    ↓
-LangGraph
-    ↓
-Router
- ┌──┼──┐
- ↓  ↓  ↓
-RAG Calc Customer
-    ↓
-Answer + Citation
-```
-
----
-
-# Example Questions
-
-## RAG
-
-```text
-What is AI?
-```
-
-```text
-What is machine learning?
-```
-
----
-
-## Calculator
-
-```text
-25 * 4
-```
-
-```text
-100 / 5
-```
-
----
-
-## Customer Lookup
-
-```text
-customer 1001
-```
-
-```text
-customer 1002
-```
-
----
-
-## Error Recovery
-
-```text
-25**
-```
-
-```text
-customer 9999
-```
-
-```text
-What is CEO salary?
-```
-
----
-
-# Features
-
-✅ PDF/TXT ingestion
-
-✅ Configurable chunking
-
-✅ Metadata generation
-
-✅ Sentence Transformer embeddings
-
-✅ FAISS vector search
-
-✅ FLAN-T5 generation
-
-✅ Query rewriting
-
-✅ Source citations
-
-✅ Safe fallback handling
-
-✅ LangGraph orchestration
-
-✅ Shared state management
-
-✅ Conditional routing
-
-✅ Multi-tool agent
-
-✅ Calculator tool
-
-✅ Customer lookup tool
-
-✅ Error recovery
-
-✅ Structured outputs
-
-✅ Evaluation framework
-
-✅ End-to-end RAG workflow
+### Document Intelligence Processing
+- Structured JSON output
+- Page references
+- Source references
+- Key-value extraction
+- OCR vs DI comparison

@@ -1,0 +1,30 @@
+{
+  "file": "INVOICE.pdf",
+  "source": "INVOICE.pdf",
+  "status": "success",
+  "pages": [
+    {
+      "page_number": 1,
+      "text": "INVOICE Invoice Number: INV-1001 Customer: ABC Trading Ltd Date: 12 October 2026 Services Provided: Consulting Services Amount Due: EUR 2,500 Thank you for your business."
+    }
+  ],
+  "key_value_pairs": [
+    {
+      "key": "Invoice Number",
+      "value": "INV-1001"
+    },
+    {
+      "key": "Customer",
+      "value": "ABC Trading Ltd"
+    },
+    {
+      "key": "Date",
+      "value": "12 October 2026 Services Provided: Consulting Services"
+    },
+    {
+      "key": "Amount Due",
+      "value": "EUR 2,500 Thank you for your business."
+    }
+  ],
+  "tables": []
+}
