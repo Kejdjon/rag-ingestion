@@ -746,3 +746,38 @@ If extraction or validation fails:
 ### Outcome
 
 The solution converts OCR and structured document output into validated business objects that can be consumed by downstream applications, APIs, databases, or analytics workflows. By using Pydantic validation, data quality and consistency are maintained while preserving document source and page references for auditing and traceability.
+
+## Week 4 - FastAPI Service Layer
+
+A FastAPI backend was implemented to provide a unified API for all previous project components.
+
+### Available Endpoints
+
+GET /health
+- Service health check
+
+POST /rag/query
+- Query the RAG system
+
+POST /agent/query
+- Query the LangGraph agent
+
+POST /document/process
+- Process document requests
+
+### Features
+
+- FastAPI REST API
+- Typed request and response models
+- Automatic input validation
+- Structured error handling
+- Swagger/OpenAPI documentation
+- Unified backend for RAG, Agent, and Document Processing services
+
+### Run
+
+uvicorn app:app --reload
+
+### Swagger UI
+
+http://127.0.0.1:8000/docs
