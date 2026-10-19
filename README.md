@@ -650,3 +650,99 @@ The OCR module successfully extracts text from scanned PDFs, normalizes the outp
 - Source references
 - Key-value extraction
 - OCR vs DI comparison
+## Week 3: Extract Validated Business Fields
+
+The final stage of the document-processing workflow transforms extracted document content into validated business data using Pydantic schemas.
+
+### Objective
+
+Convert unstructured document content into structured, application-ready JSON objects while ensuring data validation and traceability.
+
+### Technologies Used
+
+- Python
+- Pydantic
+- JSON
+- OCR Output
+- Structured Document Extraction
+
+### Invoice Schema
+
+The invoice model includes the following business fields:
+
+- Invoice Number
+- Customer
+- Invoice Date
+- Amount Due
+- Services Provided
+- Source Document
+- Page Number
+
+### Extraction Pipeline
+
+```text
+PDF
+ ↓
+OCR Processing
+ ↓
+Structured Document Output
+ ↓
+Business Field Extraction
+ ↓
+Pydantic Validation
+ ↓
+JSON Business Object
+```
+
+### Features
+
+- Strongly typed business schema
+- Structured JSON output
+- Null handling for missing information
+- Validation and fallback logic
+- Source traceability
+- Page-level evidence retention
+
+### Example Output
+
+```json
+{
+  "invoice_number": "INV-1001",
+  "customer": "ABC Trading Ltd",
+  "invoice_date": "12 October 2026",
+  "amount_due": "EUR 2,500",
+  "services_provided": "Consulting Services",
+  "source_document": "INVOICE.pdf",
+  "page_number": 1
+}
+```
+
+### Missing Data Handling
+
+Documents that do not contain invoice information return null values instead of generating or inventing data.
+
+Example:
+
+```json
+{
+  "invoice_number": null,
+  "customer": null,
+  "invoice_date": null,
+  "amount_due": null,
+  "services_provided": null,
+  "source_document": "Employee Handbook.pdf",
+  "page_number": 1
+}
+```
+
+### Validation Strategy
+
+If extraction or validation fails:
+
+- Missing values are returned as `null`
+- Source information is preserved
+- Processing continues without application failure
+
+### Outcome
+
+The solution converts OCR and structured document output into validated business objects that can be consumed by downstream applications, APIs, databases, or analytics workflows. By using Pydantic validation, data quality and consistency are maintained while preserving document source and page references for auditing and traceability.

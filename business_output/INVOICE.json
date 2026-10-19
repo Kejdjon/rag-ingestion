@@ -1,0 +1,9 @@
+{
+  "invoice_number": "INV-1001",
+  "customer": "ABC Trading Ltd",
+  "invoice_date": "12 October 2026",
+  "amount_due": "EUR 2,500",
+  "services_provided": "Consulting Services",
+  "source_document": "INVOICE.pdf",
+  "page_number": 1
+}
