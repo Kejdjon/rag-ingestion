@@ -48,7 +48,11 @@ def health():
         "status": "healthy"
     }
 
-
+@app.get("/")
+def home():
+    return {
+        "message": "AI Assistant API is running"
+    }
 # ==========================================
 # RAG Query Endpoint
 # ==========================================

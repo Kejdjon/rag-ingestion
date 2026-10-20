@@ -781,3 +781,67 @@ uvicorn app:app --reload
 ### Swagger UI
 
 http://127.0.0.1:8000/docs
+## Week 4 - FastAPI & Docker
+
+### FastAPI Service
+
+A FastAPI backend was created to expose the project functionality through REST APIs.
+
+### Endpoints
+
+- GET `/health`
+- POST `/rag/query`
+- POST `/agent/query`
+- POST `/document/process`
+
+### Features
+
+- Pydantic request/response models
+- Input validation
+- Error handling
+- Swagger/OpenAPI documentation
+
+Swagger UI:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+## Containerization
+
+The FastAPI application was containerized using Docker.
+
+### Build
+
+```bash
+docker build -t ai-assistant-api .
+```
+
+### Run
+
+```bash
+docker run -p 8000:8000 ai-assistant-api
+```
+
+### Health Check
+
+```text
+http://localhost:8000/health
+```
+
+Response:
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+### Notes
+
+- Docker image built successfully.
+- Container ran successfully.
+- API endpoints were tested through Swagger.
+- Azure deployment was not performed because no Azure environment was available.
