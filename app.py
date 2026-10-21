@@ -1,5 +1,22 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
+from dotenv import load_dotenv
+
+import json
+import uuid
+import os
+
+from pathlib import Path
+from pathlib import Path
+
+env_path = Path(__file__).parent / ".env"
+
+
+load_dotenv(dotenv_path=env_path)
+
+API_KEY = os.getenv("API_KEY")
+
+
 
 
 app = FastAPI(
@@ -7,7 +24,6 @@ app = FastAPI(
     description="Week 4 FastAPI Backend",
     version="1.0"
 )
-
 
 # ==========================================
 # Request / Response Models
@@ -34,6 +50,23 @@ class DocumentResponse(BaseModel):
     file_name: str
 
 
+class DocumentResult(BaseModel):
+    id: str
+    file_name: str
+    status: str
+
+
+# ==========================================
+# Home Endpoint
+# ==========================================
+
+@app.get("/")
+def home():
+    return {
+        "message": "AI Assistant API is running"
+    }
+
+
 # ==========================================
 # Health Endpoint
 # ==========================================
@@ -48,11 +81,7 @@ def health():
         "status": "healthy"
     }
 
-@app.get("/")
-def home():
-    return {
-        "message": "AI Assistant API is running"
-    }
+
 # ==========================================
 # RAG Query Endpoint
 # ==========================================
@@ -72,11 +101,7 @@ def rag_query(request: QueryRequest):
                 detail="Question cannot be empty"
             )
 
-        # Replace with your rag.py call
-        answer = (
-            f"RAG response for: "
-            f"{request.question}"
-        )
+        answer = f"RAG response for: {request.question}"
 
         return {
             "answer": answer
@@ -112,11 +137,7 @@ def agent_query(request: QueryRequest):
                 detail="Question cannot be empty"
             )
 
-        # Replace with your graph.py call
-        answer = (
-            f"Agent response for: "
-            f"{request.question}"
-        )
+        answer = f"Agent response for: {request.question}"
 
         return {
             "answer": answer
@@ -139,7 +160,7 @@ def agent_query(request: QueryRequest):
 
 @app.post(
     "/document/process",
-    response_model=DocumentResponse
+    response_model=DocumentResult
 )
 def process_document(request: DocumentRequest):
 
@@ -152,12 +173,24 @@ def process_document(request: DocumentRequest):
                 detail="File name cannot be empty"
             )
 
-        # Replace with your intake/ocr/extraction logic
+        document_id = str(uuid.uuid4())
 
-        return {
-            "status": "processed",
-            "file_name": request.file_name
+        result = {
+            "id": document_id,
+            "file_name": request.file_name,
+            "status": "processed"
         }
+
+        os.makedirs("storage", exist_ok=True)
+
+        with open(
+            f"storage/{document_id}.json",
+            "w"
+        ) as f:
+
+            json.dump(result, f)
+
+        return result
 
     except HTTPException:
         raise
@@ -168,3 +201,37 @@ def process_document(request: DocumentRequest):
             status_code=500,
             detail="Document processing failed"
         )
+
+
+# ==========================================
+# Retrieve Document By ID
+# ==========================================
+
+@app.get(
+    "/document/{document_id}",
+    response_model=DocumentResult
+)
+def get_document(
+    document_id: str,
+    x_api_key: str = Header(...)
+):
+
+    if x_api_key != API_KEY:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+
+    path = f"storage/{document_id}.json"
+
+    if not os.path.exists(path):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    with open(path, "r") as f:
+
+        return json.load(f)
