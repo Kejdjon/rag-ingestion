@@ -845,3 +845,29 @@ Response:
 - Container ran successfully.
 - API endpoints were tested through Swagger.
 - Azure deployment was not performed because no Azure environment was available.
+
+## Week 4 - Persistence & Security
+
+Implemented local persistence and basic security features.
+
+### Features
+
+- Document results stored on disk
+- Retrieval by document ID
+- API key authentication
+- Unauthorized access handling (401)
+- Data persists across requests
+
+### Flow
+
+POST /document/process
+    ↓
+Store JSON Result
+    ↓
+storage/
+    ↓
+GET /document/{id}
+
+### Notes
+
+Azure Blob Storage, Cosmos DB, Key Vault, Managed Identity, and RBAC could not be implemented because Azure resources were unavailable. Local storage and environment-based configuration were used to demonstrate persistence and security concepts.
