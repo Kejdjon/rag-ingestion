@@ -1,4 +1,4 @@
-name: CI
+name: CI-CD
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  build-test-package:
 
     runs-on: ubuntu-latest
 
@@ -23,7 +23,9 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pytest
 
       - name: Run Tests
         run: |
@@ -32,3 +34,17 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t ai-assistant-api .
+
+      - name: Create Deployment Package
+        run: |
+          mkdir deploy
+          cp app.py deploy/
+          cp requirements.txt deploy/
+          cp Dockerfile deploy/
+          cp README.md deploy/
+
+      - name: Upload Deployable Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-assistant-api-package
+          path: deploy/
