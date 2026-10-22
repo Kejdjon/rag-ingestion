@@ -871,3 +871,80 @@ GET /document/{id}
 ### Notes
 
 Azure Blob Storage, Cosmos DB, Key Vault, Managed Identity, and RBAC could not be implemented because Azure resources were unavailable. Local storage and environment-based configuration were used to demonstrate persistence and security concepts.
+
+## Week 4 - Observability & CI/CD
+
+### Observability
+
+Implemented observability features for monitoring and troubleshooting:
+
+- Structured application logging
+- Request correlation IDs (`X-Request-ID`)
+- Error logging
+- End-to-end request tracing
+
+Example log output:
+
+```text
+Request started | ID=30be993e...
+Request completed | ID=30be993e... Status=200
+```
+
+### Automated Testing
+
+Created automated tests for:
+
+- Home endpoint
+- Health endpoint
+- RAG endpoint
+- Agent endpoint
+- Document processing endpoint
+
+Run tests locally:
+
+```bash
+pytest
+```
+
+Example result:
+
+```text
+5 passed
+```
+
+### CI/CD Pipeline
+
+Implemented a GitHub Actions workflow:
+
+```text
+.github/workflows/ci.yml
+```
+
+The pipeline automatically:
+
+1. Checks out the code
+2. Installs dependencies
+3. Runs automated tests
+4. Builds the Docker image
+5. Creates a deployable build artifact
+
+The workflow runs automatically on every push to the repository.
+
+### Azure Notes
+
+Azure services were not used for this task because no Azure environment or subscription was available. Observability was implemented using application logs and request tracing, while CI/CD was implemented using GitHub Actions. The solution can be extended in the future with:
+
+- Azure Application Insights
+- Azure Monitor
+- Azure Container Apps
+- Azure DevOps Pipelines
+
+### Outcome
+
+- Request tracing and logging implemented
+- Automated tests integrated into the pipeline
+- Successful GitHub Actions pipeline execution
+- Docker build validation included
+- Deployable artifact produced by the pipeline
+- Application ready for future cloud deployment
+``
