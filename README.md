@@ -1,39 +1,34 @@
-# RAG Pipeline Project
+# AI Assistant Backend Project
 
-This project implements a complete Retrieval-Augmented Generation (RAG) pipeline in Python consisting of document ingestion, semantic retrieval, answer generation, LangGraph orchestration, multi-tool routing, and error recovery.
+## Overview
 
----
+This project demonstrates the development of an AI-powered backend application across four weeks, covering Retrieval-Augmented Generation (RAG), agent-based workflows, document processing, API development, containerization, persistence, security, observability, and CI/CD.
 
-# Installation
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-
-pip install pypdf
-pip install sentence-transformers
-pip install faiss-cpu
-pip install transformers
-pip install torch
-pip install langgraph
-pip install langchain-core
-```
+The solution is implemented using Python, FastAPI, Docker, Pydantic, FAISS, LangGraph, GitHub Actions, and OCR technologies.
 
 ---
 
-# Module 1: Document Ingestion (`ingest.py`)
+# Week 1 - Retrieval-Augmented Generation (RAG)
 
-Loads PDF/TXT documents, extracts and cleans text, creates configurable chunks, adds metadata, and exports the results to `chunks.json`.
+## Objective
 
-## Features
+Build a Retrieval-Augmented Generation (RAG) solution capable of answering user questions using uploaded documents instead of relying only on pre-trained model knowledge.
 
-- PDF and TXT document support
-- Text cleaning
-- Configurable chunk size
-- Configurable overlap
+## Components Implemented
+
+### Document Ingestion
+
+A document ingestion pipeline was developed to load and process PDF and text documents.
+
+Features:
+
+- PDF document support
+- Text document support
+- Text extraction
 - Metadata generation
+- Pre-processing and cleaning
 
-Metadata includes:
+Metadata example:
 
 ```json
 {
@@ -43,102 +38,82 @@ Metadata includes:
 }
 ```
 
-## Run
+### Text Chunking
 
-```bash
-python ingest.py
-```
+Large documents were divided into smaller overlapping chunks.
 
-Custom chunking:
+Benefits:
 
-```bash
-python ingest.py --chunk-size 500 --overlap 50
-```
+- Improved retrieval quality
+- Better semantic matching
+- Reduced context loss
+- Faster vector indexing
 
-## Output
+### Embedding Generation
 
-```text
-chunks.json
-```
+Document chunks were converted into vector embeddings using Sentence Transformers.
 
----
-
-# Module 2: Semantic Retrieval (`retrieval.py`)
-
-Generates embeddings using Sentence Transformers and indexes document chunks using FAISS for semantic search.
-
-## Technologies
-
-### Embedding Model
+Embedding model:
 
 ```text
 all-MiniLM-L6-v2
 ```
 
-### Vector Database
+Features:
+
+- Semantic understanding
+- Similarity-based search
+- Dense vector representations
+
+### Vector Storage
+
+Embeddings were indexed using FAISS.
+
+Benefits:
+
+- Fast retrieval
+- Efficient similarity search
+- Scalable vector storage
+
+### Semantic Retrieval
+
+When users submit a question:
+
+1. The question is converted into an embedding.
+2. FAISS performs similarity search.
+3. Most relevant chunks are retrieved.
+4. Context is passed to the generation model.
+
+### Answer Generation
+
+Retrieved context is combined with the user question to generate grounded answers.
+
+Features:
+
+- Retrieval-Augmented Generation
+- Citation support
+- Grounded answers
+- Reduced hallucinations
+
+### Query Enhancement
+
+Implemented query rewriting to improve retrieval quality.
+
+Examples:
 
 ```text
-FAISS
+AI → Artificial Intelligence
+
+ML → Machine Learning
+
+Staff → Employees
 ```
 
-## Workflow
+### Safe Failure Handling
 
-```text
-Chunks
-   ↓
-Embeddings
-   ↓
-FAISS Index
-   ↓
-Semantic Search
-```
+Unsupported questions return controlled responses.
 
-## Run
-
-```bash
-python retrieval.py
-```
-
-## Output
-
-```text
-vector.index
-```
-
----
-
-# Module 3: End-to-End RAG (`rag.py`)
-
-Combines retrieval and generation to answer user questions using retrieved document context.
-
-## Features
-
-- Query Rewriting
-- Semantic Retrieval
-- FLAN-T5 Generation
-- Source Citations
-- Safe Failure Handling
-
-## Run
-
-```bash
-python rag.py
-```
-
-## Example
-
-```text
-Question:
-What is machine learning?
-
-Answer:
-a subset of artificial intelligence
-
-Citation:
-ai_notes.txt
-```
-
-## Unsupported Question
+Example:
 
 ```text
 Question:
@@ -146,92 +121,45 @@ What is the CEO salary?
 
 Answer:
 I cannot find enough evidence in the provided documents.
-
-Citation:
-None
 ```
 
----
-
-# Module 4: Evaluation & Enhancement (`evaluation.md`)
-
-Improves retrieval quality and validates solution performance.
-
-## Enhancements
-
-- Query Rewriting
-- Citation Support
-- Grounded Answer Verification
-
-Examples:
+### Architecture
 
 ```text
-AI → Artificial Intelligence
-
-Staff → Employees
-
-ML → Machine Learning
-```
-
-## Results
-
-```text
-10 Questions Tested
-10 Correct Results
-Score: 10/10
-```
-
----
-
-# Module 5: RAG Knowledge Assistant
-
-Combines the ingestion, retrieval, and generation modules into a complete document Question & Answer assistant.
-
-## Architecture
-
-```text
+Documents
+     ↓
+Chunking
+     ↓
+Embeddings
+     ↓
+FAISS Index
+     ↓
 User Question
-      ↓
-RAG Assistant
-      ↓
-Knowledge Base
-      ↓
-Answer + Citation
+     ↓
+Retriever
+     ↓
+Relevant Context
+     ↓
+Answer Generation
 ```
 
-## Features
+### Outcome
 
-✅ Answers questions from documents
-
-✅ Returns citations
-
-✅ Reduces hallucinations
-
-✅ Safe fallback for unsupported questions
+The Week 1 solution successfully implemented a complete RAG pipeline capable of retrieving relevant information from documents and generating evidence-based answers.
 
 ---
 
-# Module 6: LangGraph Orchestration (`graph.py`)
+# Week 2 - LangGraph Agent & MCP Integration
 
-Wraps the RAG workflow into a LangGraph state machine.
+## Objective
 
-## State Schema
+Extend the RAG solution into an intelligent agent capable of selecting different tools and workflows dynamically.
 
-```python
-class AgentState(TypedDict):
-    question: str
-    tool: str
-    rewritten_question: str
-    context: str
-    answer: str
-    citation: str
-    score: float
-    status: str
-```
+## LangGraph Orchestration
 
-The state acts as shared memory between all graph nodes.
+A LangGraph workflow was designed to coordinate multiple processing steps.
 
-## Graph Architecture
+### Workflow
 
 ```text
 Question
@@ -245,30 +173,9 @@ Generate
 Output
 ```
 
-## LangGraph Components
-
-### Nodes
-
-- Rewrite Node
-- Retrieve Node
-- Generate Node
-- Output Node
-
-### Edges
-
-```text
-Rewrite
-   ↓
-Retrieve
-   ↓
-Generate
-   ↓
-Output
-```
-
 ### Shared State
 
-Stores:
+The workflow uses a shared state object containing:
 
 ```text
 Question
@@ -276,27 +183,40 @@ Context
 Answer
 Citation
 Score
+Status
 ```
+
+### Nodes
+
+Implemented nodes:
+
+- Rewrite Node
+- Retrieve Node
+- Generate Node
+- Output Node
+
+### Benefits
+
+- Modular architecture
+- State sharing
+- Easier maintenance
+- Workflow visibility
 
 ---
 
-# Module 7: Multi-Tool Agent (`graph.py`)
+## Multi-Tool Agent
 
-Extends the LangGraph workflow with multiple capabilities.
-
-## Available Tools
+The LangGraph workflow was extended with multiple tools.
 
 ### RAG Knowledge Assistant
 
-Used for document-based questions.
+Used for knowledge-based questions.
 
 Example:
 
 ```text
 What is machine learning?
 ```
-
----
 
 ### Calculator Tool
 
@@ -313,8 +233,6 @@ Output:
 ```text
 Result = 100
 ```
-
----
 
 ### Customer Lookup Tool
 
@@ -334,13 +252,11 @@ Customer: John Smith | Status: Active
 
 ---
 
-# Module 8: Routing & Recovery (`graph.py`)
+## Intelligent Routing
 
-Adds intelligent routing, structured outputs, and graceful failure handling.
+A router node was added to determine the correct processing path.
 
-## Router Node
-
-Routes questions to the correct capability.
+Workflow:
 
 ```text
 User Question
@@ -352,7 +268,7 @@ Router
 RAG Calc Customer
 ```
 
-### Routing Examples
+Routing examples:
 
 ```text
 What is AI?
@@ -371,108 +287,54 @@ customer 1001
 
 ---
 
-## Conditional Routing
-
-Implemented with LangGraph conditional edges.
-
-```python
-graph_builder.add_conditional_edges(...)
-```
-
-This dynamically selects the workflow path.
-
----
-
-## Structured Output
-
-All nodes return a consistent response structure:
-
-```python
-{
-    "status": "success",
-    "answer": "...",
-    "citation": "..."
-}
-```
-
-Error responses:
-
-```python
-{
-    "status": "error",
-    "answer": "...",
-    "citation": "..."
-}
-```
-
----
-
 ## Error Recovery
 
 The agent handles failures without crashing.
 
+Examples:
+
 ### Calculator Error
 
-Input:
-
 ```text
+Input:
 25**
-```
 
 Output:
-
-```text
 Invalid mathematical expression.
 ```
 
----
-
-### Customer Error
-
-Input:
+### Missing Customer
 
 ```text
+Input:
 customer 9999
-```
 
 Output:
-
-```text
-Customer not found
+Customer not found.
 ```
 
----
+### Unsupported Document Question
 
-### Unsupported RAG Question
-
+```text
 Input:
-
-```text
 What is CEO salary?
-```
 
 Output:
-
-```text
 I cannot find enough evidence in the provided documents.
 ```
 
 ---
-## Module 9: MCP Integration
 
-An MCP server was integrated with the LangGraph agent to provide employee lookup functionality.
+## MCP Integration
 
-### Start MCP Server
+An MCP server was integrated to provide employee lookup capabilities.
 
-```bash
-mcp run mcp_server.py --transport streamable-http
-```
+### Components
 
-### Start Agent
-
-```bash
-python graph.py
-```
+- MCP Server
+- MCP Client
+- Employee Lookup Tool
+- LangGraph MCP Routing
 
 ### Example
 
@@ -490,35 +352,37 @@ John Smith - IT
 
 ### Failure Handling
 
-If the MCP server is unavailable:
+If MCP is unavailable:
 
 ```text
 MCP server unavailable
 ```
 
+### Outcome
+
+The Week 2 solution introduced agent orchestration, intelligent routing, multi-tool support, and MCP integration while maintaining structured outputs and graceful failure handling.
+
+---
+
+# Week 3 - Document Processing & Extraction
+
+## Objective
+
+Build a complete document-processing pipeline capable of classifying documents, extracting text, performing OCR, and generating structured business data.
+
+---
+
+## PDF Intake & Classification
+
 ### Features
 
-- MCP Server (`mcp_server.py`)
-- MCP Client (`mcp_client.py`)
-- Employee Lookup Tool
-- LangGraph MCP Routing
-- Graceful Error Handling
+- PDF validation
+- Metadata extraction
+- Page counting
+- Classification logic
+- Processing path selection
 
-## Week 3: PDF Intake and Classification
-
-A PDF intake pipeline was implemented to analyze uploaded PDF documents and determine the appropriate extraction strategy.
-
-### Features
-
-- PDF validation and intake
-- Metadata extraction (file name and page count)
-- Text-based PDF detection
-- Scanned PDF detection
-- Processing-path selection
-- Classification logging
-- CSV output generation
-
-### Processing Flow
+### Workflow
 
 ```text
 PDF Upload
@@ -534,51 +398,36 @@ Text-Based PDF            Scanned PDF
 Direct Extraction           OCR Required
 ```
 
-### Classification Results
+### Classification Output
 
-| Document | Classification | Processing |
-|-----------|---------------|------------|
-| Introduction to Artificial Intelligence.pdf | Text-Based | Direct Text Extraction |
-| Employee Handbook.pdf | Text-Based | Direct Text Extraction |
-| EMPLOYEE APPLICATION FORM.pdf | Scanned | OCR Required |
-| INVOICE.pdf | Scanned | OCR Required |
-| Doc6.pdf | Scanned | OCR Required |
-
-### Run
-
-```bash
-python intake.py
-```
-
-### Output
-
-The intake module generates:
+Generated:
 
 ```text
 classification_results.csv
 ```
 
-containing:
+Containing:
 
-- File name
+- File Name
 - Status
-- Page count
+- Page Count
 - Classification
-- Processing decision
+- Processing Decision
 
 ### Outcome
 
-The solution successfully identifies whether a PDF should be processed through direct text extraction or OCR and logs the selected processing path for downstream document extraction workflows.
-## Week 3: OCR Processing
+Documents were automatically classified as text-based or scanned to determine the correct processing strategy.
 
-An OCR module was implemented to process scanned PDF documents identified during intake classification.
+---
+
+## OCR Processing
 
 ### Features
 
-- OCR extraction using Tesseract
-- Page-level OCR output
+- OCR extraction
+- Page-level processing
 - Text normalization
-- Quality assessment
+- Quality validation
 - Controlled error handling
 
 ### Workflow
@@ -586,89 +435,71 @@ An OCR module was implemented to process scanned PDF documents identified during
 ```text
 Scanned PDF
      ↓
-PDF to Image Conversion
+PDF to Image
      ↓
-OCR Extraction
+OCR
      ↓
-Text Normalization
+Normalization
      ↓
 Quality Check
-     ↓
-Structured Output
 ```
 
-### Example Results
-
-#### INVOICE.pdf
+### OCR Example
 
 ```text
-Page: 1
-Quality: OK
-
 INVOICE
+
 Invoice Number: INV-1001
 Customer: ABC Trading Ltd
 Amount Due: EUR 2,500
 ```
 
-#### EMPLOYEE APPLICATION FORM.pdf
+### Benefits
+
+- Recovery of text from scanned documents
+- Structured OCR outputs
+- Error resilience
+- Page-level traceability
+
+---
+
+## Document Intelligence Style Processing
+
+### Features
+
+- Structured extraction
+- Source tracking
+- Page references
+- OCR comparison
+- Key-value extraction
+
+Generated output includes:
 
 ```text
-Page: 1
-Quality: OK
-
-EMPLOYEE APPLICATION FORM
-First Name:
-Last Name:
-Department:
-Phone Number:
-Email Address:
-Signature:
+Source Document
+Page Number
+Extracted Fields
 ```
 
-### Outcome
+---
 
-The OCR module successfully extracts text from scanned PDFs, normalizes the output, flags low-quality pages, and returns controlled status messages when processing fails. The extracted text is prepared for downstream structured extraction and comparison activities.
-
-
-## Week 3: Document Intelligence Style Processing
-
-### PDF Intake & Classification
-- Detects text-based vs scanned PDFs
-- Extracts metadata
-- Routes documents to extraction or OCR
-
-### OCR Processing
-- Tesseract OCR
-- Text normalization
-- Quality flags
-- Error handling
-
-### Document Intelligence Processing
-- Structured JSON output
-- Page references
-- Source references
-- Key-value extraction
-- OCR vs DI comparison
-## Week 3: Extract Validated Business Fields
-
-The final stage of the document-processing workflow transforms extracted document content into validated business data using Pydantic schemas.
+## Business Field Extraction
 
 ### Objective
 
-Convert unstructured document content into structured, application-ready JSON objects while ensuring data validation and traceability.
+Transform extracted text into validated business objects.
 
-### Technologies Used
+### Technologies
 
 - Python
 - Pydantic
 - JSON
 - OCR Output
-- Structured Document Extraction
+- Structured Extraction
 
 ### Invoice Schema
 
-The invoice model includes the following business fields:
+Included fields:
 
 - Invoice Number
 - Customer
@@ -678,31 +509,6 @@ The invoice model includes the following business fields:
 - Source Document
 - Page Number
 
-### Extraction Pipeline
-
-```text
-PDF
- ↓
-OCR Processing
- ↓
-Structured Document Output
- ↓
-Business Field Extraction
- ↓
-Pydantic Validation
- ↓
-JSON Business Object
-```
-
-### Features
-
-- Strongly typed business schema
-- Structured JSON output
-- Null handling for missing information
-- Validation and fallback logic
-- Source traceability
-- Page-level evidence retention
-
 ### Example Output
 
 ```json
@@ -710,125 +516,49 @@ JSON Business Object
   "invoice_number": "INV-1001",
   "customer": "ABC Trading Ltd",
   "invoice_date": "12 October 2026",
-  "amount_due": "EUR 2,500",
+  "amount_due": "EUR 2500",
   "services_provided": "Consulting Services",
   "source_document": "INVOICE.pdf",
   "page_number": 1
 }
 ```
 
-### Missing Data Handling
+### Validation
 
-Documents that do not contain invoice information return null values instead of generating or inventing data.
-
-Example:
+Missing fields are returned as:
 
 ```json
 {
-  "invoice_number": null,
-  "customer": null,
-  "invoice_date": null,
-  "amount_due": null,
-  "services_provided": null,
-  "source_document": "Employee Handbook.pdf",
-  "page_number": 1
+  "customer": null
 }
 ```
 
-### Validation Strategy
-
-If extraction or validation fails:
-
-- Missing values are returned as `null`
-- Source information is preserved
-- Processing continues without application failure
+instead of generating invalid values.
 
 ### Outcome
 
-The solution converts OCR and structured document output into validated business objects that can be consumed by downstream applications, APIs, databases, or analytics workflows. By using Pydantic validation, data quality and consistency are maintained while preserving document source and page references for auditing and traceability.
-
-## Week 4 - FastAPI Service Layer
-
-A FastAPI backend was implemented to provide a unified API for all previous project components.
-
-### Available Endpoints
-
-GET /health
-- Service health check
-
-POST /rag/query
-- Query the RAG system
-
-POST /agent/query
-- Query the LangGraph agent
-
-POST /document/process
-- Process document requests
-
-### Features
-
-- FastAPI REST API
-- Typed request and response models
-- Automatic input validation
-- Structured error handling
-- Swagger/OpenAPI documentation
-- Unified backend for RAG, Agent, and Document Processing services
-
-### Run
-
-uvicorn app:app --reload
-
-### Swagger UI
-
-http://127.0.0.1:8000/docs
-## Week 4 - FastAPI & Docker
-
-### FastAPI Service
-
-A FastAPI backend was created to expose the project functionality through REST APIs.
-
-### Endpoints
-
-- GET `/health`
-- POST `/rag/query`
-- POST `/agent/query`
-- POST `/document/process`
-
-### Features
-
-- Pydantic request/response models
-- Input validation
-- Error handling
-- Swagger/OpenAPI documentation
-
-Swagger UI:
-
-```text
-http://localhost:8000/docs
-```
+The Week 3 solution converts raw documents into validated, structured business objects suitable for APIs, databases, analytics, and downstream automation.
 
 ---
 
-## Containerization
+# Week 4 - FastAPI Service Layer
 
-The FastAPI application was containerized using Docker.
+## Objective
 
-### Build
+Expose project functionality through REST APIs.
 
-```bash
-docker build -t ai-assistant-api .
-```
+## Implemented Endpoints
 
-### Run
+### Home
 
-```bash
-docker run -p 8000:8000 ai-assistant-api
+```http
+GET /
 ```
 
 ### Health Check
 
-```text
-http://localhost:8000/health
+```http
+GET /health
 ```
 
 Response:
@@ -839,112 +569,341 @@ Response:
 }
 ```
 
-### Notes
+### RAG Query
 
-- Docker image built successfully.
-- Container ran successfully.
-- API endpoints were tested through Swagger.
-- Azure deployment was not performed because no Azure environment was available.
+```http
+POST /rag/query
+```
 
-## Week 4 - Persistence & Security
+### Agent Query
 
-Implemented local persistence and basic security features.
+```http
+POST /agent/query
+```
+
+### Process Document
+
+```http
+POST /document/process
+```
+
+### Retrieve Stored Document
+
+```http
+GET /document/{document_id}
+```
+
+### Delete Stored Document
+
+```http
+DELETE /document/{document_id}
+```
+
+## Swagger Documentation
+
+Available at:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+# Persistence and Security
+
+## Persistence
+
+Since Azure storage services were unavailable, local persistence was implemented.
+
+### Storage Method
+
+Processed documents are stored as JSON files inside:
+
+```text
+storage/
+```
+
+Example:
+
+```json
+{
+  "id": "123",
+  "file_name": "INVOICE.pdf",
+  "status": "processed"
+}
+```
 
 ### Features
 
-- Document results stored on disk
+- Persistent storage across requests
 - Retrieval by document ID
-- API key authentication
-- Unauthorized access handling (401)
-- Data persists across requests
+- Document deletion
+- State maintained between API calls
 
-### Flow
+## Security
 
-POST /document/process
-    ↓
-Store JSON Result
-    ↓
-storage/
-    ↓
-GET /document/{id}
+### API Key Authentication
 
-### Notes
-
-Azure Blob Storage, Cosmos DB, Key Vault, Managed Identity, and RBAC could not be implemented because Azure resources were unavailable. Local storage and environment-based configuration were used to demonstrate persistence and security concepts.
-
-## Week 4 - Observability & CI/CD
-
-### Observability
-
-Implemented observability features for monitoring and troubleshooting:
-
-- Structured application logging
-- Request correlation IDs (`X-Request-ID`)
-- Error logging
-- End-to-end request tracing
-
-Example log output:
+Secrets are stored in:
 
 ```text
-Request started | ID=30be993e...
-Request completed | ID=30be993e... Status=200
+.env
 ```
 
-### Automated Testing
+Example:
 
-Created automated tests for:
+```text
+API_KEY=rag123456
+```
 
-- Home endpoint
-- Health endpoint
-- RAG endpoint
-- Agent endpoint
-- Document processing endpoint
+### Environment Variable Loading
 
-Run tests locally:
+Configuration is loaded using:
+
+```python
+python-dotenv
+```
+
+### Protected Endpoints
+
+Retrieve and delete operations require:
+
+```text
+x-api-key
+```
+
+### Unauthorized Access
+
+Returns:
+
+```json
+{
+  "detail": "Unauthorized"
+}
+```
+
+---
+
+# Containerization
+
+## Docker
+
+### Build Image
+
+```bash
+docker build -t ai-assistant-api .
+```
+
+### Run Container
+
+```bash
+docker run -p 8000:8000 ai-assistant-api
+```
+
+### Verification
+
+Health endpoint:
+
+```http
+GET /health
+```
+
+Response:
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+Azure deployment was not performed because an Azure environment was unavailable.
+
+---
+
+# Observability
+
+## Features
+
+### Structured Logging
+
+Implemented application logging using Python logging.
+
+### Request Correlation IDs
+
+Each request receives:
+
+```text
+X-Request-ID
+```
+
+Example:
+
+```text
+ID=30be993e-0caa-4499-9f0a-b00e336ebcdf
+```
+
+### Request Tracing
+
+```text
+Request started | ID=...
+Request completed | ID=... Status=200
+```
+
+### Error Visibility
+
+Examples:
+
+```text
+401 Unauthorized
+404 Not Found
+500 Internal Server Error
+```
+
+---
+
+# Automated Testing
+
+## Test Coverage
+
+Implemented automated tests for:
+
+- Home Endpoint
+- Health Endpoint
+- RAG Endpoint
+- Agent Endpoint
+- Document Processing Endpoint
+
+### Run Tests
 
 ```bash
 pytest
 ```
 
-Example result:
+### Result
 
 ```text
 5 passed
 ```
 
-### CI/CD Pipeline
+---
 
-Implemented a GitHub Actions workflow:
+# CI/CD Pipeline
+
+## Technology
+
+GitHub Actions
+
+Pipeline file:
 
 ```text
 .github/workflows/ci.yml
 ```
 
+### Pipeline Workflow
+
+```text
+Code Push
+    ↓
+Install Dependencies
+    ↓
+Run Automated Tests
+    ↓
+Build Docker Image
+    ↓
+Create Deployable Artifact
+```
+
+### Automated Validation
+
 The pipeline automatically:
 
-1. Checks out the code
-2. Installs dependencies
-3. Runs automated tests
-4. Builds the Docker image
-5. Creates a deployable build artifact
+- Installs dependencies
+- Executes tests
+- Builds Docker image
+- Produces deployable artifacts
 
-The workflow runs automatically on every push to the repository.
+The workflow executes automatically on every push.
 
-### Azure Notes
+---
 
-Azure services were not used for this task because no Azure environment or subscription was available. Observability was implemented using application logs and request tracing, while CI/CD was implemented using GitHub Actions. The solution can be extended in the future with:
+# Azure Alternatives Used
 
-- Azure Application Insights
-- Azure Monitor
-- Azure Container Apps
-- Azure DevOps Pipelines
+Azure resources were not available during development. Equivalent local implementations were used to demonstrate the same architectural concepts.
 
-### Outcome
+| Azure Service | Implemented Alternative |
+|--------------|-------------------------|
+| Azure Blob Storage | Local JSON Storage (`storage/`) |
+| Azure Cosmos DB | JSON File Persistence |
+| Azure Key Vault | `.env` + `python-dotenv` |
+| Managed Identity | API Key Authentication |
+| RBAC | API Key Authorization |
+| Azure Application Insights | Structured Logging |
+| Azure Monitor | Request Logs |
+| Azure DevOps Pipelines | GitHub Actions |
+| Azure Deployment | Docker Image + Deployable Artifact |
 
-- Request tracing and logging implemented
-- Automated tests integrated into the pipeline
-- Successful GitHub Actions pipeline execution
-- Docker build validation included
-- Deployable artifact produced by the pipeline
-- Application ready for future cloud deployment
-``
+---
+
+# Project Structure
+
+```text
+rag-ingestion/
+│
+├── app.py
+├── test_app.py
+├── Dockerfile
+├── requirements.txt
+├── README.md
+├── .env
+├── .gitignore
+│
+├── storage/
+│
+└── .github/
+    └── workflows/
+        └── ci.yml
+```
+
+---
+
+# Outcome
+
+The final solution provides:
+
+✅ Retrieval-Augmented Generation (RAG)
+
+✅ LangGraph agent orchestration
+
+✅ Multi-tool routing
+
+✅ MCP integration
+
+✅ PDF intake and classification
+
+✅ OCR processing
+
+✅ Business field extraction and validation
+
+✅ FastAPI backend services
+
+✅ OpenAPI / Swagger documentation
+
+✅ Persistent document storage
+
+✅ Authentication and authorization
+
+✅ Docker containerization
+
+✅ Structured logging
+
+✅ Request correlation IDs
+
+✅ End-to-end request tracing
+
+✅ Automated testing
+
+✅ GitHub Actions CI/CD pipeline
+
+✅ Deployable application artifact
+
+The solution is fully functional locally and structured for future deployment to Azure or other cloud platforms.
